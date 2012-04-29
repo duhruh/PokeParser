@@ -4,9 +4,9 @@ open FILE, "<listOfPokemon.txt" or die("Could not open file!");
 
 use strict;
 use warnings;
-my $curpokemon;
+my $curpokemon = "Seaking";
 use LWP::Simple;
-foreach $curpokemon (<FILE>){
+#foreach $curpokemon (<FILE>){
 chomp $curpokemon;
 
 
@@ -139,16 +139,34 @@ if($website_content =~ /<b>Type\(s\):<\/b>(\n)<\/th><td style="vertical-align:to
 		}
 			
 	}
-	#print $temp."\n";
+	print $temp."\n";
 }
+if($website_content =~ /<b>Type\(s\):<\/b>(\n)<\/th><td style="vertical-align:top; padding-right:1em;"> <b><a href="\/wiki(.*)/)
+{
+        #print "Type(s): ";
+        my $type = $2;
+        my $temp2 = "";
+        my $type2 = "";
+        if($type =~ />(.[A-Za-z0-9]*)<(.*)>(.[A-Za-b0-9]*)/){
+                $temp = $1;
+                $temp2 = $2;
+                if($temp2 =~ />(.[A-Za-z0-9]*[^\/])</){
+                        $type2 = $1;
+                        $temp = $temp."/".$type2;
+                }
+
+        }
+        print $temp."\n";
+}
+
 if($website_content =~ /<b>Height:<\/b>(\n)<\/th><td style="vertical-align:top; padding-right:1em;"> <span class="explain" title="&#123;&#123;&#123;ImHeight}}}">(.*)</)
 {
 	#print "Height: ";
 	 $height  = $2;
-	if($height =~ /(.*)>(.*)</){
-		$height =$2;
+	if($height =~ /(\d'(?:\s*\d+'')?[0-9]*.)/){
+		$height =$1;
 	}
-	#print $height."\n";
+	print $height."\n";
 }
 if($website_content =~ /<b>Weight:<\/b>(\n)<\/th><td style="vertical-align:top; padding-right:1em;"> <span class="explain" title="&#123;&#123;&#123;ImWeight}}}">(.*)</)
 {
@@ -163,12 +181,24 @@ if($website_content =~ />Abilities<\/a>:<\/b>(\n)(.*)/)
 {
 	#print "Abilities: ";
 	my $tempAbil = $2;
+	my $temp = "";
 	 $abil = "";
-	if($tempAbil =~ />(.[A-Za-z0-9]*[^\s])</){
-		$abil = $1;
+	my $flag = 0;
+	#print $tempAbil."\n";
+	while($tempAbil =~ />(.[A-Za-z0-9^\s]*.)</g){
+		if($flag == 0){
+		   $abil = $1;
+		   $flag =1;
+		}
+		else{
+		   $abil = $abil."/".$1;
+		}
+		#print $1."\n";
+		#$abil = $1;
+		#$temp = $1;
 	}
-		
-	#print $abil."\n";
+	#print $temp."\n";	
+	print $abil."\n";
 }
 if($website_content =~ /Species<\/a>:<\/b>(\n)<\/th><td style="vertical-align:top; padding-right:1em;"> (.*)/)
 {
@@ -191,13 +221,13 @@ if($website_content =~ /<b>Black<\/b>(\n)<\/th><\/tr>(\n)(\n)<tr style="horizant
 
 
 use DBI;
-my $dbh = DBI->connect("dbi:SQLite:dbname=nationaldex.sql","","");
-my $hold = "PLACEHOLDER";
+#my $dbh = DBI->connect("dbi:SQLite:dbname=nationaldex.sql","","");
+#my $hold = "PLACEHOLDER";
 #$dbh->do("INSERT INTO pokemon(name,evlovesFrom,evolvesInto,pronounce,hp,attack,defense,spAtk,spDef,speed,statTotal,species,type,height,weight,abilities,weakness,bio,layout,pic,icon) VALUES(".$name.",".$evolvesFrom.",".$evolvesTo.",".$dbh->quote($pro).",".$hp.",".$atk.",".$def.",".$spAtk.",".$spDef.",".$speed.",".$stat.",".$dbh->quote($spe).",".$temp.",".$dbh->quote($height).",".$dbh->quote($weight).",".$abil.",WEAK,".$dbh->quote($bio).",layout.png,".$name.".png,icon.png)");
-my $statment = $dbh->prepare("INSERT INTO pokemon(name,evolvesFrom,evolvesInto,pronunce,hp,attack,defense,spAtk,spDef,speed,statTotal,species,type,height,weight,abilities,weakness,bio,layout,pic,icon) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-$statment->execute($name,$evolvesFrom,$evolvesTo,$dbh->quote($pro),$hp,$atk,$def,$spAtk,$spDef,$speed,$stat,$dbh->quote($spe),$temp,$dbh->quote($height),$dbh->quote($weight),$abil,$hold,$dbh->quote($bio),$hold,$name.".png","thumb_".$name.".png");
-$dbh->disconnect();
-}
+#my $statment = $dbh->prepare("INSERT INTO pokemon(name,evolvesFrom,evolvesInto,pronunce,hp,attack,defense,spAtk,spDef,speed,statTotal,species,type,height,weight,abilities,weakness,bio,layout,pic,icon) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+#$statment->execute($name,$evolvesFrom,$evolvesTo,$dbh->quote($pro),$hp,$atk,$def,$spAtk,$spDef,$speed,$stat,$dbh->quote($spe),$temp,$dbh->quote($height),$dbh->quote($weight),$abil,$hold,$dbh->quote($bio),$hold,$name.".png","thumb_".$name.".png");
+#$dbh->disconnect();
+#}
 
 close($file);
 
