@@ -1,4 +1,41 @@
-Bulbasaur
-Ivysaur
-Venusaur
+my $file;
+open FILE, "<listOfPokemon.txt" or die("Could not open file!");
 
+use strict;
+use warnings;
+my $curpokemon;
+use LWP::Simple;
+foreach $curpokemon (<FILE>){
+chomp $curpokemon;
+
+
+my $url = "http://pokemon.wikia.com/wiki/".$curpokemon;
+my $website_content = get($url);
+my $icon;
+
+
+print "Name: ".$curpokemon."\n";
+my $name = $curpokemon;
+
+if($website_content =~ / <b>Icon\(s\):<\/b>(\n)<\/th><td style="vertical-align:top; padding-right:1em;"> <a href="((http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:\/~\+#]*[\w\-\@?^=%&amp;\/~\+#])?)"/)
+{ print "ICON:";
+  use Image::Grab qw(grab);
+        my $icon = $2;
+        print $icon."\n";
+        my $pic = grab(URL=>$icon);
+        open(IMAGE, ">icons/icon_".$name.".png") || die $name."png: $!";
+        print IMAGE $pic;
+        close(IMAGE);
+
+}
+
+#use DBI;
+#my $dbh = DBI->connect("dbi:SQLite:dbname=nationaldex.sql","","");
+#my $hold = "PLACEHOLDER";
+#$dbh->do("INSERT INTO pokemon(name,evlovesFrom,evolvesInto,pronounce,hp,attack,defense,spAtk,spDef,speed,statTotal,species,type,height,weight,abilities,weakness,bio,layout,pic,icon) VALUES(".$name.",".$evolvesFrom.",".$evolvesTo.",".$dbh->quote($pro).",".$hp.",".$atk.",".$def.",".$spAtk.",".$spDef.",".$speed.",".$stat.",".$dbh->quote($spe).",".$temp.",".$dbh->quote($height).",".$dbh->quote($weight).",".$abil.",WEAK,".$dbh->quote($bio).",layout.png,".$name.".png,icon.png)");
+#my $statment = $dbh->prepare("INSERT INTO pokemon(name,evolvesFrom,evolvesInto,pronunce,hp,attack,defense,spAtk,spDef,speed,statTotal,species,type,height,weight,abilities,weakness,bio,layout,pic,icon) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+#$statment->execute($name,$evolvesFrom,$evolvesTo,$dbh->quote($pro),$hp,$atk,$def,$spAtk,$spDef,$speed,$stat,$dbh->quote($spe),$temp,$dbh->quote($height),$dbh->quote($weight),$abil,$hold,$dbh->quote($bio),$hold,$name.".png","icon_".$name.".png");
+#$dbh->disconnect();
+}
+
+close($file);
